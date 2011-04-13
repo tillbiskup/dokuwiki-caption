@@ -1,0 +1,15 @@
+div.figure {}
+
+div.table {}
+
+div.caption {
+    margin: 1ex 0ex;
+	border-left: 5px #ccc solid;
+	padding-left: 5px;
+}
+
+span.captionno {
+	font-weight: bold;
+}
+
+span.captiontext {}
