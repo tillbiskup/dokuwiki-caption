@@ -1,6 +1,10 @@
-div.figure {}
+div.figure {
+	margin-bottom: 1em;
+}
 
-div.table {}
+div.table {
+	margin-bottom: 1em;
+}
 
 div.caption {
     margin: 1ex 0ex;

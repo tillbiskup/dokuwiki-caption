@@ -28,6 +28,13 @@ class syntax_plugin_caption extends DokuWiki_Syntax_Plugin {
 	private $_fignum = 1;
 	private $_tabnum = 1;
 
+    /**
+     * return some info
+     */
+    function getInfo(){
+        return confToHash(dirname(__FILE__).'/plugin.info.txt');
+    }
+
     public function getType() {
         return 'container';
     }
