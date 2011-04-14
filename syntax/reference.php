@@ -70,7 +70,9 @@ class syntax_plugin_caption_reference extends DokuWiki_Syntax_Plugin {
             
             switch ($state) {
                 case DOKU_LEXER_SPECIAL :
-                	$renderer->doc .= $_SESSION['caption_labels'][$match];
+			        global $caption_labels;
+                	$renderer->doc .= $caption_labels[$match];
+//                	$renderer->doc .= $_SESSION['caption_labels'][$match];
                     break;
             }
             return true;

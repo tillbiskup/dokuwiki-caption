@@ -97,14 +97,18 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
 		    	                $renderer->doc .= '<div class="figure">';
 		    	                // If we have a label, assign it to the global label array
 			                	if ($label) {
-			                		$_SESSION['caption_labels'][$label] = $this->_fignum;
+			                		global $caption_labels;
+			                		$caption_labels[$label] = $this->_fignum;
+//			                		$_SESSION['caption_labels'][$label] = $this->_fignum;
             			    	}
 		        	            break;
                     		case table :
 		    	                $renderer->doc .= '<div class="table">';
 		    	                // If we have a label, assign it to the global label array
 			                	if ($label) {
-			                		$_SESSION['caption_labels'][$label] = $this->_tabnum;
+			                		global $caption_labels;
+			                		$caption_labels[$label] = $this->_tabnum;
+//			                		$_SESSION['caption_labels'][$label] = $this->_tabnum;
             			    	}
 		                    	break;
 						}
