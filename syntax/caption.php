@@ -221,10 +221,10 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_EXIT :
 					switch ($this->_type) {
 						case figure :
-		                    $renderer->doc .= '\end{figure}';
+		                    $renderer->doc .= '\end{figure}' . "\n\n";
 		    	            break;
                 		case table :
-	    	                $renderer->doc .= '\end{table}';
+	    	                $renderer->doc .= '\end{table}' . "\n\n";
 	    	            	break;
 					}
 					$this->_type = '';
