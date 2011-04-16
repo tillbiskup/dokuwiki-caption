@@ -233,6 +233,11 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
             return true;
         }
         
+        /**
+         * WARNING: The odt mode seems to work in general, but strange things happen
+         *          with the tables - therefore, within the table tags only a table
+         *			is allowed, without any additional markup.
+         */
         if ($mode == 'odt') {
 
             list($state,$match) = $data;
