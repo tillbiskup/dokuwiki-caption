@@ -89,6 +89,21 @@ class syntax_plugin_caption_reference extends DokuWiki_Syntax_Plugin {
             }
             return true;
         }
+        
+        if ($mode == 'odt') {
+
+            list($state,$match) = $data;
+            
+            switch ($state) {
+                case DOKU_LEXER_SPECIAL :
+                	$renderer->doc .= '<text:sequence-ref text:reference-format="value" text:ref-name="'.$match.'">';
+			        global $caption_labels;
+                	$renderer->doc .= $caption_labels[$match];
+                	$renderer->doc .= '</text:sequence-ref>';
+                    break;
+            }
+            return true;
+        }
 
         // unsupported $mode
         return false;

@@ -232,6 +232,113 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
             }
             return true;
         }
+        
+        if ($mode == 'odt') {
+
+            list($state,$match) = $data;
+
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                	// Handle case that there is a label in the opening tag
+                	list($match,$label) = explode(' ',$match);
+					if (in_array($match,$this->_types)) {
+						$this->_type = $match;
+						switch ($this->_type) {
+							case figure :
+		    	                // If we have a label, assign it to the global label array
+			                	if ($label) {
+			                		global $caption_labels;
+			                		$caption_labels[$label] = $this->_fignum;
+            			    	}
+		        	            break;
+                    		case table :
+		    	                // If we have a label, assign it to the global label array
+			                	if ($label) {
+			                		global $caption_labels;
+			                		$caption_labels[$label] = $this->_tabnum;
+            			    	}
+		                    	break;
+						}
+						$renderer->p_open();
+					}
+                    break;
+
+                case DOKU_LEXER_MATCHED :
+                	// return the dokuwiki markup within the caption tags
+                	if (!$this->_incaption) {
+                		$this->_incaption = true;
+						$renderer->p_close();
+						switch ($this->_type) {
+							case figure :
+			                    $renderer->doc .= '<text:p text:style-name="Illustration">';
+		    	                if ($this->getConf('abbrev')) {
+		    	                	$renderer->doc .= $this->getLang('figureabbrev');
+		    	                } else {
+		    	                	$renderer->doc .= $this->getLang('figurelong');
+		    	                }
+		    	                $renderer->doc .= '<text:sequence text:ref-name="';
+			            		if ($this->_label) {
+					                $renderer->doc .= $this->_label;
+					                $this->_label = '';
+		            			} else {
+		            				$renderer->doc .= 'refIllustration' . $this->_fignum;
+		            			}
+		    	                $renderer->doc .= '" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">';
+		    	                $renderer->doc .= ' ' . $this->_fignum . '</text:sequence>: ';
+		                    	break;
+                    		case table :
+			                    $renderer->doc .= '<text:p text:style-name="Table">';
+		    	                if ($this->getConf('abbrev')) {
+		    	                	$renderer->doc .= $this->getLang('tableabbrev');
+		    	                } else {
+		    	                	$renderer->doc .= $this->getLang('tablelong');
+		    	                }
+		    	                $renderer->doc .= '<text:sequence text:ref-name="';
+			            		if ($this->_label) {
+					                $renderer->doc .= $this->_label;
+					                $this->_label = '';
+		            			} else {
+		            				$renderer->doc .= 'refTable' . $this->_tabnum;
+		            			}
+		    	                $renderer->doc .= '" text:name="Table" text:formula="ooow:Table+1" style:num-format="1">';
+		    	                $renderer->doc .= ' ' . $this->_tabnum . '</text:sequence>: ';
+		                    	break;
+						}
+                	} else {
+        	            $renderer->doc .= '</text:p>';
+                		$this->_incaption = false;
+						switch ($this->_type) {
+							case figure :
+								$renderer->p_open();
+                	    		break;
+            	        	case table :
+//								$renderer->p_open();
+    	                		break;
+						}
+                	}
+					break;
+
+                case DOKU_LEXER_UNMATCHED :
+                	// return the dokuwiki markup within the figure tags
+                    $renderer->cdata($match);
+                    break;
+
+                case DOKU_LEXER_EXIT :
+					// increment figure/table number
+					switch ($this->_type) {
+						case figure :
+                    		$this->_fignum++;
+							$renderer->p_close();
+                    		break;
+                    	case table :
+                    		$this->_tabnum++;
+                    		break;
+					}
+					$this->_type = '';
+					break;
+            }
+            return true;
+        }
 
         // unsupported $mode
         return false;
