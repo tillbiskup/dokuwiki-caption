@@ -36,7 +36,7 @@ class syntax_plugin_caption_reference extends DokuWiki_Syntax_Plugin {
     }
 
     public function getType() {
-        return 'container';
+        return 'substition';
     }
 
     public function getAllowedTypes() {
