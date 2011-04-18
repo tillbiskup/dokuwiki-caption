@@ -7,6 +7,7 @@ div.table {
 }
 
 div.caption {
+	clear:both;
     margin: 2ex 0ex;
 	border-left: 5px #ccc solid;
 	padding-left: 5px;
