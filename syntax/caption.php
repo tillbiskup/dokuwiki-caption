@@ -30,6 +30,9 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
 	
 	private $_label = '';
 	
+	private $_figlabels = array();
+	private $_tablabels = array();
+	
     /**
      * return some info
      */
@@ -94,22 +97,38 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
 						$this->_type = $match;
 						switch ($this->_type) {
 							case figure :
-		    	                $renderer->doc .= '<div class="figure">';
+		    	                $renderer->doc .= '<div class="figure"';
 		    	                // If we have a label, assign it to the global label array
 			                	if ($label) {
 			                		global $caption_labels;
 			                		$caption_labels[$label] = $this->_fignum;
-//			                		$_SESSION['caption_labels'][$label] = $this->_fignum;
+			                		$this->_figlabels[$this->_fignum] = $label;
+			                		$renderer->doc .= ' id="'.$renderer->_xmlEntities($label).'"';
+		    	                	// WARNING: Potential harmful way of handling references
+									//          that have already been printed
+									$pattern = '##REF:'.$this->_figlabels[$this->_fignum].'##';
+							        if (strpos($renderer->doc, $pattern) !== FALSE) { 
+				        			    $renderer->doc = str_replace($pattern, $this->_fignum, $renderer->doc);
+							        }
             			    	}
+            			    	$renderer->doc .= '>';
 		        	            break;
                     		case table :
-		    	                $renderer->doc .= '<div class="table">';
+		    	                $renderer->doc .= '<div class="table"';
 		    	                // If we have a label, assign it to the global label array
 			                	if ($label) {
 			                		global $caption_labels;
 			                		$caption_labels[$label] = $this->_tabnum;
-//			                		$_SESSION['caption_labels'][$label] = $this->_tabnum;
+			                		$this->_tablabels[$this->_tabnum] = $label;
+			                		$renderer->doc .= ' id="'.$renderer->_xmlEntities($label).'"';
+		    	                	// WARNING: Potential harmful way of handling references
+									//          that have already been printed
+									$pattern = '##REF:'.$this->_tablabels[$this->_tabnum].'##';
+							        if (strpos($renderer->doc, $pattern) !== FALSE) { 
+				        			    $renderer->doc = str_replace($pattern, $this->_tabnum, $renderer->doc);
+							        }
             			    	}
+            			    	$renderer->doc .= '>';
 		                    	break;
 						}
 					}
@@ -122,7 +141,12 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
 	                    $renderer->doc .= '<div class="caption">';
 						switch ($this->_type) {
 							case figure :
-		    	                $renderer->doc .= '<span class="captionno">';
+		    	                $renderer->doc .= '<span class="captionno"';
+		    	                if(array_key_exists($this->_fignum,$this->_figlabels)) {
+		    	                	$renderer->doc .= ' title="'
+		    	                						.$this->_figlabels[$this->_fignum].'"';
+		    	                }
+		    	                $renderer->doc .= '>';
 		    	                if ($this->getConf('abbrev')) {
 		    	                	$renderer->doc .= $this->getLang('figureabbrev');
 		    	                } else {
@@ -132,7 +156,12 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
 		    	                $renderer->doc .= ' <span class="captiontext">';
 		        	            break;
                     		case table :
-		    	                $renderer->doc .= '<span class="captionno">';
+		    	                $renderer->doc .= '<span class="captionno"';
+		    	                if(array_key_exists($this->_tabnum,$this->_tablabels)) {
+		    	                	$renderer->doc .= ' title="'
+		    	                						.$this->_tablabels[$this->_tabnum].'"';
+		    	                }
+		    	                $renderer->doc .= '>';
 		    	                if ($this->getConf('abbrev')) {
 		    	                	$renderer->doc .= $this->getLang('tableabbrev');
 		    	                } else {
