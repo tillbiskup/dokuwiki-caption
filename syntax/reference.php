@@ -20,14 +20,14 @@ class syntax_plugin_caption_reference extends DokuWiki_Syntax_Plugin {
     /**
      * Array containing the types of environment supported by the plugin
      */
-	private $_types = array('figure','table');
+    private $_types = array('figure','table');
 
-	private $_type = '';
-	private $_incaption = false;
+    private $_type = '';
+    private $_incaption = false;
 
-	private $_fignum = 1;
-	private $_tabnum = 1;
-	
+    private $_fignum = 1;
+    private $_tabnum = 1;
+    
     /**
      * return some info
      */
@@ -58,8 +58,8 @@ class syntax_plugin_caption_reference extends DokuWiki_Syntax_Plugin {
 
     public function handle($match, $state, $pos, &$handler){
         if (!(strpos($match,'{{ref>')===false)) {
-          	return array($state, substr($match,6,-2));
-	    }
+              return array($state, substr($match,6,-2));
+        }
         return array();
     }
 
@@ -70,14 +70,14 @@ class syntax_plugin_caption_reference extends DokuWiki_Syntax_Plugin {
             
             switch ($state) {
                 case DOKU_LEXER_SPECIAL :
-			        global $caption_labels;
-                	$renderer->doc .= '<a href="#'.$match.'">';
-                	if ($caption_labels[$match]) {
-	                	$renderer->doc .= $caption_labels[$match];
-	                } else {
-	                	$renderer->doc .= '##REF:'.$match.'##';
-	                }
-                	$renderer->doc .= '</a>';
+                    global $caption_labels;
+                    $renderer->doc .= '<a href="#'.$match.'">';
+                    if ($caption_labels[$match]) {
+                        $renderer->doc .= $caption_labels[$match];
+                    } else {
+                        $renderer->doc .= '##REF:'.$match.'##';
+                    }
+                    $renderer->doc .= '</a>';
                     break;
             }
             return true;
@@ -89,7 +89,7 @@ class syntax_plugin_caption_reference extends DokuWiki_Syntax_Plugin {
             
             switch ($state) {
                 case DOKU_LEXER_SPECIAL :
-                	$renderer->doc .= '\ref{'.$match.'}';
+                    $renderer->doc .= '\ref{'.$match.'}';
                     break;
             }
             return true;
@@ -101,10 +101,10 @@ class syntax_plugin_caption_reference extends DokuWiki_Syntax_Plugin {
             
             switch ($state) {
                 case DOKU_LEXER_SPECIAL :
-                	$renderer->doc .= '<text:sequence-ref text:reference-format="value" text:ref-name="'.$match.'">';
-			        global $caption_labels;
-                	$renderer->doc .= $caption_labels[$match];
-                	$renderer->doc .= '</text:sequence-ref>';
+                    $renderer->doc .= '<text:sequence-ref text:reference-format="value" text:ref-name="'.$match.'">';
+                    global $caption_labels;
+                    $renderer->doc .= $caption_labels[$match];
+                    $renderer->doc .= '</text:sequence-ref>';
                     break;
             }
             return true;

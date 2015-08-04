@@ -14,7 +14,9 @@ $lang['figurelong'] = 'Figure';
 $lang['figureabbrev'] = 'Fig.';
 $lang['tablelong'] = 'Table';
 $lang['tableabbrev'] = 'Tab.';
-
+$lang['figure'] = 'Add figure with caption';
+$lang['table'] = 'Add table with caption';
+$lang['reference'] = 'Reference to figure/table';
 
 
 //Setup VIM: ex: et ts=4 :
