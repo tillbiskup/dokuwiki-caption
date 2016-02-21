@@ -14,7 +14,7 @@ require_once(DOKU_PLUGIN.'action.php');
 
 class action_plugin_caption extends DokuWiki_Action_Plugin {
 
-    public function register(&$controller) {
+    public function register(Doku_Event_Handler $controller) {
         $controller->register_hook("TOOLBAR_DEFINE", "AFTER", $this, "insert_button", array ());
     }
 
