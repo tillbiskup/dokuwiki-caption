@@ -283,6 +283,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 if ($label) {
                                     global $caption_labels;
                                     $caption_labels[$label] = $this->_fignum;
+                                    $this->_label = $label;
                                 }
                                 break;
                             case table :
@@ -290,6 +291,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 if ($label) {
                                     global $caption_labels;
                                     $caption_labels[$label] = $this->_tabnum;
+                                    $this->_label = $label;
                                 }
                                 break;
                         }
