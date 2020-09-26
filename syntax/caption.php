@@ -70,7 +70,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
         $this->Lexer->addExitPattern('</table>','plugin_caption_caption');
     }
 
-    public function handle($match, $state, $pos, &$handler){
+    public function handle($match, $state, $pos, Doku_Handler $handler){
         switch ($state) {
           case DOKU_LEXER_ENTER :
             $match = substr($match,1,-1);
@@ -84,7 +84,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
         return array();
     }
 
-    public function render($mode, &$renderer, $data) {
+    public function render($mode, Doku_Renderer $renderer, $data) {
         if ($mode == 'xhtml') {
 
             list($state,$match) = $data;
@@ -96,7 +96,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                     if (in_array($match,$this->_types)) {
                         $this->_type = $match;
                         switch ($this->_type) {
-                            case figure :
+                            case "figure" :
                                 $renderer->doc .= '<div class="figure"';
                                 // If we have a label, assign it to the global label array
                                 if ($label) {
@@ -113,7 +113,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 }
                                 $renderer->doc .= '>';
                                 break;
-                            case table :
+                            case "table" :
                                 $renderer->doc .= '<div class="table"';
                                 // If we have a label, assign it to the global label array
                                 if ($label) {
@@ -140,7 +140,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                         $this->_incaption = true;
                         $renderer->doc .= '<div class="caption">';
                         switch ($this->_type) {
-                            case figure :
+                            case "figure" :
                                 $renderer->doc .= '<span class="captionno"';
                                 if(array_key_exists($this->_fignum,$this->_figlabels)) {
                                     $renderer->doc .= ' title="'
@@ -155,7 +155,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 $renderer->doc .= ' ' . $this->_fignum . ':</span>';
                                 $renderer->doc .= ' <span class="captiontext">';
                                 break;
-                            case table :
+                            case "table" :
                                 $renderer->doc .= '<span class="captionno"';
                                 if(array_key_exists($this->_tabnum,$this->_tablabels)) {
                                     $renderer->doc .= ' title="'
@@ -185,10 +185,10 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_EXIT :
                     // increment figure/table number
                     switch ($this->_type) {
-                        case figure :
+                        case "figure" :
                             $this->_fignum++;
                             break;
-                        case table :
+                        case "table" :
                             $this->_tabnum++;
                             break;
                     }
@@ -210,14 +210,14 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                     if (in_array($match,$this->_types)) {
                         $this->_type = $match;
                         switch ($this->_type) {
-                            case figure :
+                            case "figure" :
                                 $renderer->doc .= '\begin{figure}';
                                 // If we have a label, assign it to the global label array
                                 if ($label) {
                                     $this->_label = $label;
                                 }
                                 break;
-                            case table :
+                            case "table" :
                                 $renderer->doc .= '\begin{table}';
                                 if ($label) {
                                     $this->_label = $label;
@@ -249,10 +249,10 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
 
                 case DOKU_LEXER_EXIT :
                     switch ($this->_type) {
-                        case figure :
+                        case "figure" :
                             $renderer->doc .= '\end{figure}' . "\n\n";
                             break;
-                        case table :
+                        case "table" :
                             $renderer->doc .= '\end{table}' . "\n\n";
                             break;
                     }
@@ -278,18 +278,20 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                     if (in_array($match,$this->_types)) {
                         $this->_type = $match;
                         switch ($this->_type) {
-                            case figure :
+                            case "figure" :
                                 // If we have a label, assign it to the global label array
                                 if ($label) {
                                     global $caption_labels;
                                     $caption_labels[$label] = $this->_fignum;
+                                    $this->_label = $label;
                                 }
                                 break;
-                            case table :
+                            case "table" :
                                 // If we have a label, assign it to the global label array
                                 if ($label) {
                                     global $caption_labels;
                                     $caption_labels[$label] = $this->_tabnum;
+                                    $this->_label = $label;
                                 }
                                 break;
                         }
@@ -303,7 +305,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                         $this->_incaption = true;
                         $renderer->p_close();
                         switch ($this->_type) {
-                            case figure :
+                            case "figure" :
                                 $renderer->doc .= '<text:p text:style-name="Illustration">';
                                 if ($this->getConf('abbrev')) {
                                     $renderer->doc .= $this->getLang('figureabbrev');
@@ -320,7 +322,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 $renderer->doc .= '" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">';
                                 $renderer->doc .= ' ' . $this->_fignum . '</text:sequence>: ';
                                 break;
-                            case table :
+                            case "table" :
                                 $renderer->doc .= '<text:p text:style-name="Table">';
                                 if ($this->getConf('abbrev')) {
                                     $renderer->doc .= $this->getLang('tableabbrev');
@@ -342,10 +344,10 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                         $renderer->doc .= '</text:p>';
                         $this->_incaption = false;
                         switch ($this->_type) {
-                            case figure :
+                            case "figure" :
                                 $renderer->p_open();
                                 break;
-                            case table :
+                            case "table" :
 //                                $renderer->p_open();
                                 break;
                         }
@@ -360,11 +362,11 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_EXIT :
                     // increment figure/table number
                     switch ($this->_type) {
-                        case figure :
+                        case "figure" :
                             $this->_fignum++;
                             $renderer->p_close();
                             break;
-                        case table :
+                        case "table" :
                             $this->_tabnum++;
                             break;
                     }

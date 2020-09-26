@@ -56,14 +56,14 @@ class syntax_plugin_caption_reference extends DokuWiki_Syntax_Plugin {
         $this->Lexer->addSpecialPattern('{{ref>.+?}}',$mode,'plugin_caption_reference');
     }
 
-    public function handle($match, $state, $pos, &$handler){
+    public function handle($match, $state, $pos, Doku_Handler $handler){
         if (!(strpos($match,'{{ref>')===false)) {
               return array($state, substr($match,6,-2));
         }
         return array();
     }
 
-    public function render($mode, &$renderer, $data) {
+    public function render($mode, Doku_Renderer $renderer, $data) {
         if ($mode == 'xhtml') {
 
             list($state,$match) = $data;
