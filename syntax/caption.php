@@ -114,7 +114,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 $renderer->doc .= '>';
                                 break;
                             case "table" :
-                                $renderer->doc .= '<div class="table"';
+                                $renderer->doc .= '<div class="plugin_caption_table"';
                                 // If we have a label, assign it to the global label array
                                 if ($label) {
                                     global $caption_labels;
