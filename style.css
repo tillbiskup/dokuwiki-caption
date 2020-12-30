@@ -1,4 +1,4 @@
-div.figure {
+div.figure, figure.figure {
     margin-bottom: 1em;
 }
 
@@ -6,7 +6,7 @@ div.table {
     margin-bottom: 1em;
 }
 
-div.caption {
+div.caption, figcaption.caption {
     clear:both;
     margin: 2ex 0ex;
     border-left: 5px #ccc solid;
