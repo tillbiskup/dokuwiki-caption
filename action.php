@@ -29,16 +29,18 @@ class action_plugin_caption extends DokuWiki_Action_Plugin {
             'class' => 'captionpicker',
             'list' => array(
                 array(
-                     'type' => 'insert',
+                     'type' => 'format',
                      'title' => $this->getLang('figure'),
                      'icon' => '../../plugins/caption/images/fig.png',
-                     'insert' => '<figure label>\n{{:img |title}}\n<caption>caption</caption>\n</figure>',
+					                'open' => '<figure label>\n',
+                     'close' => '\n<caption>caption</caption>\n</figure>',
                 ),
                 array(
-                     'type' => 'insert',
+                     'type' => 'format',
                      'title' => $this->getLang('table'),
                      'icon' => '../../plugins/caption/images/tab.png',
-                     'insert' => '<table label>\n<caption>caption</caption>\n| table |\n</table>',
+					                'open' => '<table label>\n<caption>caption</caption>\n',
+                     'close' => '\n</table>',
                 ),
                 array(
                      'type' => 'insert',
