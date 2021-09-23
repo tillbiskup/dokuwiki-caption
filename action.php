@@ -32,14 +32,14 @@ class action_plugin_caption extends DokuWiki_Action_Plugin {
                      'type' => 'format',
                      'title' => $this->getLang('figure'),
                      'icon' => '../../plugins/caption/images/fig.png',
-					                'open' => '<figure label>\n',
+		     'open' => '<figure label>\n',
                      'close' => '\n<caption>caption</caption>\n</figure>',
                 ),
                 array(
                      'type' => 'format',
                      'title' => $this->getLang('table'),
                      'icon' => '../../plugins/caption/images/tab.png',
-					                'open' => '<table label>\n<caption>caption</caption>\n',
+		     'open' => '<table label>\n<caption>caption</caption>\n',
                      'close' => '\n</table>',
                 ),
                 array(
