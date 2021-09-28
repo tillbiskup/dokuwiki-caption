@@ -140,7 +140,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                         $this->_incaption = true;
                         switch ($this->_type) {
                             case "figure" :
-                                $renderer->doc .= '<figcaption class="pluginc_caption_caption"><span class="plugin_caption_caption_number"';
+                                $renderer->doc .= '<figcaption class="plugin_caption_caption"><span class="plugin_caption_caption_number"';
                                 if(array_key_exists($this->_fignum,$this->_figlabels)) {
                                     $renderer->doc .= ' title="'
                                                         .$this->_figlabels[$this->_fignum].'"';
