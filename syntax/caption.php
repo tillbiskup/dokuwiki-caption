@@ -20,18 +20,22 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
     /**
      * Array containing the types of environment supported by the plugin
      */
-    private $_types = array('figure','table');
+    private $_types = array('figure','table','codeblock','fileblock');
 
     private $_type = '';
     private $_incaption = false;
 
     private $_fignum = 1;
     private $_tabnum = 1;
+    private $_codenum = 1;
+    private $_filenum = 1;
     
     private $_label = '';
     
     private $_figlabels = array();
     private $_tablabels = array();
+    private $_codelabels = array();
+    private $_filelabels = array();
     
     /**
      * return some info
@@ -49,7 +53,6 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
     }
 
     public function getPType() {
-//        return 'stack';
         return 'block';
     }
 
@@ -61,6 +64,8 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
     public function connectTo($mode) {
         $this->Lexer->addEntryPattern('<figure.*?>(?=.*</figure>)',$mode,'plugin_caption_caption');
         $this->Lexer->addEntryPattern('<table.*?>(?=.*</table>)',$mode,'plugin_caption_caption');
+        $this->Lexer->addEntryPattern('<codeblock.*?>(?=.*</codeblock>)',$mode,'plugin_caption_caption');
+        $this->Lexer->addEntryPattern('<fileblock.*?>(?=.*</fileblock>)',$mode,'plugin_caption_caption');
         $this->Lexer->addPattern('<caption>(?=.*</caption>)','plugin_caption_caption');
         $this->Lexer->addPattern('</caption>','plugin_caption_caption');
     }
@@ -68,6 +73,8 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
     public function postConnect() {
         $this->Lexer->addExitPattern('</figure>','plugin_caption_caption');
         $this->Lexer->addExitPattern('</table>','plugin_caption_caption');
+        $this->Lexer->addExitPattern('</codeblock>','plugin_caption_caption');
+        $this->Lexer->addExitPattern('</fileblock>','plugin_caption_caption');
     }
 
     public function handle($match, $state, $pos, Doku_Handler $handler){
@@ -130,6 +137,40 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 }
                                 $renderer->doc .= '>';
                                 break;
+                            case "codeblock" :
+                                $renderer->doc .= '<div class="plugin_caption_codeblock"';
+                                // If we have a label, assign it to the global label array
+                                if ($label) {
+                                    global $caption_labels;
+                                    $caption_labels[$label] = $this->_tabnum;
+                                    $this->_tablabels[$this->_codenum] = $label;
+                                    $renderer->doc .= ' id="'.$renderer->_xmlEntities($label).'"';
+                                    // WARNING: Potential harmful way of handling references
+                                    //          that have already been printed
+                                    $pattern = '##REF:'.$this->_codelabels[$this->_codenum].'##';
+                                    if (strpos($renderer->doc, $pattern) !== FALSE) { 
+                                        $renderer->doc = str_replace($pattern, $this->_codenum, $renderer->doc);
+                                    }
+                                }
+                                $renderer->doc .= '>';
+                                break;
+                            case "fileblock" :
+                                $renderer->doc .= '<div class="plugin_caption_fileblock"';
+                                // If we have a label, assign it to the global label array
+                                if ($label) {
+                                    global $caption_labels;
+                                    $caption_labels[$label] = $this->_filenum;
+                                    $this->_tablabels[$this->_filenum] = $label;
+                                    $renderer->doc .= ' id="'.$renderer->_xmlEntities($label).'"';
+                                    // WARNING: Potential harmful way of handling references
+                                    //          that have already been printed
+                                    $pattern = '##REF:'.$this->_filelabels[$this->_filenum].'##';
+                                    if (strpos($renderer->doc, $pattern) !== FALSE) { 
+                                        $renderer->doc = str_replace($pattern, $this->_filenum, $renderer->doc);
+                                    }
+                                }
+                                $renderer->doc .= '>';
+                                break;
                         }
                     }
                     break;
@@ -169,6 +210,36 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 $renderer->doc .= ' ' . $this->_tabnum . ':</span>';
                                 $renderer->doc .= ' <span class="captiontext">';
                                 break;
+                            case "codeblock" :
+                                $renderer->doc .= '<div class="plugin_caption_caption"><span class="plugin_caption_caption_number"';
+                                if(array_key_exists($this->_codenum,$this->_codelabels)) {
+                                    $renderer->doc .= ' title="'
+                                                        .$this->_codelabels[$this->_codenum].'"';
+                                }
+                                $renderer->doc .= '>';
+                                if ($this->getConf('abbrev')) {
+                                    $renderer->doc .= $this->getLang('codeabbrev');
+                                } else {
+                                    $renderer->doc .= $this->getLang('codelong');
+                                }
+                                $renderer->doc .= ' ' . $this->_codenum . ':</span>';
+                                $renderer->doc .= ' <span class="captiontext">';
+                                break;
+                            case "fileblock" :
+                                $renderer->doc .= '<div class="plugin_caption_caption"><span class="plugin_caption_caption_number"';
+                                if(array_key_exists($this->_filenum,$this->_filelabels)) {
+                                    $renderer->doc .= ' title="'
+                                                        .$this->_tablabels[$this->_filenum].'"';
+                                }
+                                $renderer->doc .= '>';
+                                if ($this->getConf('abbrev')) {
+                                    $renderer->doc .= $this->getLang('fileabbrev');
+                                } else {
+                                    $renderer->doc .= $this->getLang('filelong');
+                                }
+                                $renderer->doc .= ' ' . $this->_filenum . ':</span>';
+                                $renderer->doc .= ' <span class="captiontext">';
+                                break;
                         }
                     } else {
                         $this->_incaption = false;
@@ -177,6 +248,12 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 $renderer->doc .= '</span></figcaption>';
                                 break;
                             case "table" :
+                                $renderer->doc .= '</span></div>';
+                                break;
+                            case "codeblock" :
+                                $renderer->doc .= '</span></div>';
+                                break;
+                            case "fileblock" :
                                 $renderer->doc .= '</span></div>';
                                 break;
                         }
@@ -197,6 +274,14 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                             break;
                         case "table" :
                             $this->_tabnum++;
+                            $renderer->doc .= '</div>';
+                            break;
+                        case "codeblock" :
+                            $this->_codenum++;
+                            $renderer->doc .= '</div>';
+                            break;
+                        case "fileblock" :
+                            $this->_filenum++;
                             $renderer->doc .= '</div>';
                             break;
                     }
