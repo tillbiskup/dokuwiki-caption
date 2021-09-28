@@ -1,4 +1,4 @@
-div.plugin_caption_figure {
+div.plugin_caption_figure, figure.plugin_caption_figure {
     margin-bottom: 1em;
 }
 
@@ -6,7 +6,7 @@ div.plugin_caption_table {
     margin-bottom: 1em;
 }
 
-div.plugin_caption_caption {
+div.plugin_caption_caption, figcaption.plugin_caption_caption {
     clear:both;
     margin: 2ex 0ex;
     border-left: 5px #ccc solid;
