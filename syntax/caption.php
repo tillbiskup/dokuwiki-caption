@@ -97,7 +97,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                         $this->_type = $match;
                         switch ($this->_type) {
                             case "figure" :
-                                $renderer->doc .= '<div class="figure"';
+                                $renderer->doc .= '<div class="plugin_caption_figure"';
                                 // If we have a label, assign it to the global label array
                                 if ($label) {
                                     global $caption_labels;
@@ -138,10 +138,10 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                     // return the dokuwiki markup within the caption tags
                     if (!$this->_incaption) {
                         $this->_incaption = true;
-                        $renderer->doc .= '<div class="caption">';
+                        $renderer->doc .= '<div class="plugin_caption_caption">';
                         switch ($this->_type) {
                             case "figure" :
-                                $renderer->doc .= '<span class="captionno"';
+                                $renderer->doc .= '<span class="plugin_caption_caption_number"';
                                 if(array_key_exists($this->_fignum,$this->_figlabels)) {
                                     $renderer->doc .= ' title="'
                                                         .$this->_figlabels[$this->_fignum].'"';
@@ -153,10 +153,10 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                     $renderer->doc .= $this->getLang('figurelong');
                                 }
                                 $renderer->doc .= ' ' . $this->_fignum . ':</span>';
-                                $renderer->doc .= ' <span class="captiontext">';
+                                $renderer->doc .= ' <span class="plugin_caption_caption_text">';
                                 break;
                             case "table" :
-                                $renderer->doc .= '<span class="captionno"';
+                                $renderer->doc .= '<span class="plugin_caption_caption_number"';
                                 if(array_key_exists($this->_tabnum,$this->_tablabels)) {
                                     $renderer->doc .= ' title="'
                                                         .$this->_tablabels[$this->_tabnum].'"';
