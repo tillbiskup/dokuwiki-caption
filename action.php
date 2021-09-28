@@ -33,6 +33,7 @@ class action_plugin_caption extends DokuWiki_Action_Plugin {
                      'title' => $this->getLang('figure'),
                      'icon' => '../../plugins/caption/images/fig.png',
 		     'open' => '<figure label>\n',
+		     'sample' => '{{:img |title}}',
                      'close' => '\n<caption>caption</caption>\n</figure>',
                 ),
                 array(
@@ -40,7 +41,8 @@ class action_plugin_caption extends DokuWiki_Action_Plugin {
                      'title' => $this->getLang('table'),
                      'icon' => '../../plugins/caption/images/tab.png',
 		     'open' => '<table label>\n<caption>caption</caption>\n',
-                     'close' => '\n</table>',
+		     'sample' => '^ Header1 ^ Header2 ^\n| foo    | bar    |\n',
+                     'close' => '</table>',
                 ),
                 array(
                      'type' => 'insert',
