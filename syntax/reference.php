@@ -20,16 +20,7 @@ class syntax_plugin_caption_reference extends DokuWiki_Syntax_Plugin {
     /**
      * Array containing the types of environment supported by the plugin
      */
-    private $_types = array('figure','table','codeblock','fileblock');
 
-    private $_type = '';
-    private $_incaption = false;
-
-    private $_fignum = 1;
-    private $_tabnum = 1;
-    private $_codenum = 1;
-    private $_filenum = 1;
-    
     /**
      * return some info
      */
@@ -68,7 +59,7 @@ class syntax_plugin_caption_reference extends DokuWiki_Syntax_Plugin {
     public function render($mode, Doku_Renderer $renderer, $data) {
         if ($mode == 'xhtml') {
 
-            list($state,$match) = $data;
+	    list($state,$match) = $data;
             
             switch ($state) {
                 case DOKU_LEXER_SPECIAL :

@@ -62,6 +62,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
 
 
     public function connectTo($mode) {
+        $this->Lexer->addSpecialPattern('{{setcounter [a-z0-9=]+?}}',$mode,'plugin_caption_caption');
         $this->Lexer->addEntryPattern('<figure.*?>(?=.*</figure>)',$mode,'plugin_caption_caption');
         $this->Lexer->addEntryPattern('<table.*?>(?=.*</table>)',$mode,'plugin_caption_caption');
         $this->Lexer->addEntryPattern('<codeblock.*?>(?=.*</codeblock>)',$mode,'plugin_caption_caption');
@@ -80,13 +81,19 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
     public function handle($match, $state, $pos, Doku_Handler $handler){
         switch ($state) {
           case DOKU_LEXER_ENTER :
-            $match = substr($match,1,-1);
+	      $match = substr($match,1,-1);
               return array($state, $match);
-          case DOKU_LEXER_MATCHED :    return array($state, $match);
-          case DOKU_LEXER_UNMATCHED :  return array($state, $match);
+	  case DOKU_LEXER_MATCHED :
+              return array($state, $match);
+	  case DOKU_LEXER_UNMATCHED :
+              return array($state, $match);
           case DOKU_LEXER_EXIT :
-            $match = substr($match,1,-1);
+              $match = substr($match,1,-1);
               return array($state, $match);
+	  case DOKU_LEXER_SPECIAL :
+              if (!(strpos($match,'{{setcounter')===false)) {
+                  return array($state, substr($match,13,-2));
+              }
         }
         return array();
     }
@@ -175,8 +182,8 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                     }
                     break;
 
-                case DOKU_LEXER_MATCHED :
-                    // return the dokuwiki markup within the caption tags
+		case DOKU_LEXER_MATCHED :
+		    // return the dokuwiki markup within the caption tags
                     if (!$this->_incaption) {
                         $this->_incaption = true;
                         switch ($this->_type) {
@@ -286,7 +293,25 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                             break;
                     }
                     $this->_type = '';
-                    break;
+		    break;
+
+		case DOKU_LEXER_SPECIAL :
+		    list($_type,$_num) = explode('=',trim($match)); 
+                    $_type = trim($_type);
+		    $_num = (int) trim($_num);
+		    if (in_array($_type,$this->_types)) {
+                        switch ($_type) {
+                            case "figure" :
+				$this->_fignum = $_num;
+                            case "table" :
+				$this->_tabnum = $_num;
+                            case "codeblock" :
+				$this->_codenum = $_num;
+                            case "fileblock" :
+				$this->_filenum = $_num;
+			}
+		    }
+		    break;
             }
             return true;
         }
