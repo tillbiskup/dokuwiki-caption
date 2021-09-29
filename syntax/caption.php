@@ -302,13 +302,17 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
 		    if (in_array($_type,$this->_types)) {
                         switch ($_type) {
                             case "figure" :
-				$this->_fignum = $_num;
+                                $this->_fignum = $_num;
+                                break;
                             case "table" :
 				$this->_tabnum = $_num;
+                                break;
                             case "codeblock" :
 				$this->_codenum = $_num;
+                                break;
                             case "fileblock" :
 				$this->_filenum = $_num;
+                                break;
 			}
 		    }
 		    break;
