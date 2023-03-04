@@ -65,7 +65,7 @@ class syntax_plugin_caption_reference extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_SPECIAL :
                     global $caption_labels;
                     $renderer->doc .= '<a href="#'.$match.'">';
-                    if ($caption_labels[$match]) {
+                    if (isset($caption_labels[$match]) && $caption_labels[$match]) {
                         $renderer->doc .= $caption_labels[$match];
                     } else {
                         $renderer->doc .= '##REF:'.$match.'##';

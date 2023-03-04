@@ -150,13 +150,15 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 if ($label) {
                                     global $caption_labels;
                                     $caption_labels[$label] = $this->_tabnum;
-                                    $this->_tablabels[$this->_codenum] = $label;
+                                    $this->_codelabels[$this->_codenum] = $label;
                                     $renderer->doc .= ' id="'.$renderer->_xmlEntities($label).'"';
                                     // WARNING: Potential harmful way of handling references
                                     //          that have already been printed
-                                    $pattern = '##REF:'.$this->_codelabels[$this->_codenum].'##';
-                                    if (strpos($renderer->doc, $pattern) !== FALSE) { 
-                                        $renderer->doc = str_replace($pattern, $this->_codenum, $renderer->doc);
+                                    if(isset($this->_codelabels[$this->_codenum])) {
+                                        $pattern = '##REF:'.$this->_codelabels[$this->_codenum].'##';
+                                        if (strpos($renderer->doc, $pattern) !== FALSE) { 
+                                            $renderer->doc = str_replace($pattern, $this->_codenum, $renderer->doc);
+                                        }
                                     }
                                 }
                                 $renderer->doc .= '>';
