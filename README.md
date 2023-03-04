@@ -1,6 +1,6 @@
 # caption Plugin for DokuWiki
 
-adding figure and table captions
+adding figure, table, and code captions
 
 All documentation for this plugin can be found at
 http://till-biskup.de/de/software/dokuwiki/caption
@@ -13,7 +13,7 @@ Please refer to http://www.dokuwiki.org/plugins for additional info
 on how to install plugins in DokuWiki.
 
 ----
-Copyright (C) Till Biskup <till@till-biskup>
+Copyright (C) Till Biskup <till@till-biskup.de>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
