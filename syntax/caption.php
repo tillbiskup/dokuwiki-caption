@@ -110,7 +110,8 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                     if function_exists('sexplode') {
                         list($match,$label) = sexplode(' ',$match,2);
                     } else {
-                        list($match,$label) = explode(' ',$match);
+                        $match = explode(' ',$match)[0];
+                        $label = count(explode(' ',$match)) > 1 ? explode(' ',$match)[1] : null;
                     }
                     if (in_array($match,$this->_types)) {
                         $this->_type = $match;
