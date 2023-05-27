@@ -106,13 +106,9 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
             switch ($state) {
                 case DOKU_LEXER_ENTER :
                     // Handle case that there is a label in the opening tag
-                    // "sexplode" was introduced in DokuWiki 2023-04-04 Jack Jackrum
-                    if (function_exists('sexplode')) {
-                        list($match,$label) = sexplode(' ',$match,2);
-                    } else {
-                        $match = explode(' ',$match)[0];
-                        $label = count(explode(' ',$match)) > 1 ? explode(' ',$match)[1] : null;
-                    }
+                    // Fix warnings in PHP >=8.1, not relying on "sexplode" in DW Jack Jackrum
+                    $match = explode(' ',$match)[0];
+                    $label = count(explode(' ',$match)) > 1 ? explode(' ',$match)[1] : null;
                     if (in_array($match,$this->_types)) {
                         $this->_type = $match;
                         switch ($this->_type) {
