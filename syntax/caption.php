@@ -106,7 +106,12 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
             switch ($state) {
                 case DOKU_LEXER_ENTER :
                     // Handle case that there is a label in the opening tag
-                    list($match,$label) = explode(' ',$match);
+                    // "sexplode" was introduced in DokuWiki 2023-04-04 Jack Jackrum
+                    if function_exists('sexplode') {
+                        list($match,$label) = sexplode(' ',$match,2);
+                    } else {
+                        list($match,$label) = explode(' ',$match);
+                    }
                     if (in_array($match,$this->_types)) {
                         $this->_type = $match;
                         switch ($this->_type) {
