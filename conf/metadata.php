@@ -7,6 +7,5 @@
 
 
 //$meta['fixme'] = array('string');
-$meta['_basic'] = array('fieldset');
 $meta['abbrev'] = array('onoff');
 

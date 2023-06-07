@@ -6,5 +6,4 @@
  */
 
 //$conf['fixme']    = 'FIXME';
-$conf['_basic'] = '';
 $conf['abbrev'] = '';
