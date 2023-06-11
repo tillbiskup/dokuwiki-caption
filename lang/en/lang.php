@@ -2,7 +2,7 @@
 /**
  * English language file for caption plugin
  *
- * @author Till Biskup <till@till-biskup>
+ * @author Till Biskup <till@till-biskup.de>
  */
 
 // menu entry for admin plugins

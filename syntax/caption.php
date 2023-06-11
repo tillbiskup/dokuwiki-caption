@@ -3,7 +3,7 @@
  * DokuWiki Plugin caption (Syntax Component)
  *
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
- * @author  Till Biskup <till@till-biskup>
+ * @author  Till Biskup <till@till-biskup.de>
  */
 
 // must be run within Dokuwiki

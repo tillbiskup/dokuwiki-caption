@@ -1,8 +1,8 @@
 <?php
 /**
- * English language file for caption plugin
+ * Language file for caption plugin
  *
- * @author Till Biskup <till@till-biskup>
+ * @author Eduardo Mozart de Oliveira
  */
 
 // menu entry for admin plugins

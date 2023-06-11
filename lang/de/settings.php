@@ -2,7 +2,7 @@
 /**
  * German language file for caption plugin
  *
- * @author Till Biskup <till@till-biskup>
+ * @author Till Biskup <till@till-biskup.de>
  */
 
 // keys need to match the config setting name
