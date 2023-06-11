@@ -2,11 +2,10 @@
 /**
  * Options for the caption plugin
  *
- * @author Till Biskup <till@till-biskup>
+ * @author Till Biskup <till@till-biskup.de>
  */
 
 
 //$meta['fixme'] = array('string');
-$meta['_basic'] = array('fieldset');
 $meta['abbrev'] = array('onoff');
 

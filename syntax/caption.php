@@ -3,7 +3,7 @@
  * DokuWiki Plugin caption (Syntax Component)
  *
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
- * @author  Till Biskup <till@till-biskup>
+ * @author  Till Biskup <till@till-biskup.de>
  */
 
 // must be run within Dokuwiki
@@ -107,10 +107,9 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_ENTER :
                     // Handle case that there is a label in the opening tag
                     // Fix warnings in PHP >=8.1, not relying on "sexplode" in DW Jack Jackrum
-                    $match = explode(' ',$match)[0];
                     $label = count(explode(' ',$match)) > 1 ? explode(' ',$match)[1] : null;
-                    if (in_array($match,$this->_types)) {
-                        $this->_type = $match;
+                    if (in_array(explode(' ',$match)[0],$this->_types)) {
+                        $this->_type = explode(' ',$match)[0];
                         switch ($this->_type) {
                             case "figure" :
                                 $renderer->doc .= '<figure class="plugin_caption_figure"';
