@@ -421,42 +421,23 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                         $renderer->p_close();
                         switch ($this->_type) {
                             case "figure" :
-                                $renderer->doc .= '<text:p text:style-name="Illustration">';
                                 if ($this->getConf('abbrev')) {
-                                    $renderer->doc .= $this->getLang('figureabbrev');
+                                    $renderer->cdata($this->getLang('figureabbrev'));
                                 } else {
-                                    $renderer->doc .= $this->getLang('figurelong');
+                                    $renderer->cdata($this->getLang('figurelong'));
                                 }
-                                $renderer->doc .= '<text:sequence text:ref-name="';
-                                if ($this->_label) {
-                                    $renderer->doc .= $this->_label;
-                                    $this->_label = '';
-                                } else {
-                                    $renderer->doc .= 'refIllustration' . $this->_fignum;
-                                }
-                                $renderer->doc .= '" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">';
-                                $renderer->doc .= ' ' . $this->_fignum . '</text:sequence>: ';
+                                $renderer->cdata(" " . $this->_fignum . ": ");
                                 break;
                             case "table" :
-                                $renderer->doc .= '<text:p text:style-name="Table">';
                                 if ($this->getConf('abbrev')) {
-                                    $renderer->doc .= $this->getLang('tableabbrev');
+                                    $renderer->cdata($this->getLang('tableabbrev'));
                                 } else {
-                                    $renderer->doc .= $this->getLang('tablelong');
+                                    $renderer->cdata($this->getLang('tablelong'));
                                 }
-                                $renderer->doc .= '<text:sequence text:ref-name="';
-                                if ($this->_label) {
-                                    $renderer->doc .= $this->_label;
-                                    $this->_label = '';
-                                } else {
-                                    $renderer->doc .= 'refTable' . $this->_tabnum;
-                                }
-                                $renderer->doc .= '" text:name="Table" text:formula="ooow:Table+1" style:num-format="1">';
-                                $renderer->doc .= ' ' . $this->_tabnum . '</text:sequence>: ';
+                                $renderer->cdata(" " . $this->_tabnum . ": ");
                                 break;
                         }
                     } else {
-                        $renderer->doc .= '</text:p>';
                         $this->_incaption = false;
                         switch ($this->_type) {
                             case "figure" :
