@@ -1,7 +1,7 @@
 base   caption
 author Till Biskup
-email  till@till-biskup.de
-date   2023-11-19
+email  code@till-biskup.de
+date   2024-02-24
 name   caption plugin
 desc   adding figure and table captions
 url    https://www.dokuwiki.org/plugin:caption
