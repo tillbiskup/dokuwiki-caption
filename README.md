@@ -13,7 +13,7 @@ Please refer to http://www.dokuwiki.org/plugins for additional info
 on how to install plugins in DokuWiki.
 
 ----
-Copyright (C) Till Biskup <till@till-biskup.de>
+Copyright (c) Till Biskup <code@till-biskup.de>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
