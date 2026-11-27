@@ -27,6 +27,128 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
     private $_tablabels = array();
     private $_codelabels = array();
     private $_filelabels = array();
+
+    private $_odt_page_id = null;
+    private $_odt_step_count = 0;
+
+    /**
+     * Build a lowercase, collision-free ODT bookmark ID for a caption label.
+     */
+    public static function odtBookmarkId($label, Doku_Renderer $renderer) {
+        $escaped = method_exists($renderer, '_xmlEntities')
+            ? $renderer->_xmlEntities(trim($label))
+            : htmlspecialchars(trim($label), ENT_QUOTES, 'UTF-8');
+        return 'plugin_caption_' . str_replace(' ', '_', strtolower($escaped));
+    }
+
+    /**
+     * Track how many caption steps have executed on the current page ID.
+     */
+    private function _recordOdtStep() {
+        global $ID;
+        if ($this->_odt_page_id !== $ID) {
+            $this->_odt_page_id = $ID;
+            $this->_odt_step_count = 0;
+        }
+        $this->_odt_step_count++;
+    }
+
+    /**
+     * Recursively collect caption ENTER and SPECIAL steps from instructions.
+     */
+    private function _collectOdtCaptionSteps(array $instructions, array &$steps) {
+        foreach ($instructions as $ins) {
+            if (!is_array($ins) || !isset($ins[0])) {
+                continue;
+            }
+            if ($ins[0] === 'nest' && isset($ins[1][0]) && is_array($ins[1][0])) {
+                $this->_collectOdtCaptionSteps($ins[1][0], $steps);
+                continue;
+            }
+            if ($ins[0] !== 'plugin' || !isset($ins[1][0]) || $ins[1][0] !== 'caption_caption') {
+                continue;
+            }
+            $data = isset($ins[1][1]) && is_array($ins[1][1]) ? $ins[1][1] : array();
+            if (count($data) < 2) {
+                continue;
+            }
+            list($state, $match) = $data;
+            if ($state === DOKU_LEXER_ENTER) {
+                $parts = explode(' ', $match);
+                $type = $parts[0];
+                if (in_array($type, $this->_types)) {
+                    $steps[] = array(
+                        'state' => DOKU_LEXER_ENTER,
+                        'type' => $type,
+                        'label' => count($parts) > 1 ? $parts[1] : null,
+                    );
+                }
+            } elseif ($state === DOKU_LEXER_SPECIAL && strpos($match, '=') !== false) {
+                list($type, $num) = explode('=', trim($match), 2);
+                $type = trim($type);
+                if (in_array($type, $this->_types)) {
+                    $steps[] = array(
+                        'state' => DOKU_LEXER_SPECIAL,
+                        'type' => $type,
+                        'num' => (int) trim($num),
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * Resolve a forward reference label on the current page from cached instructions.
+     */
+    public function resolveForwardRef($label) {
+        global $ID, $REV;
+        if (empty($ID) || !function_exists('wikiFN')) {
+            return null;
+        }
+        $file = wikiFN($ID, $REV);
+        if (!file_exists($file)) {
+            return null;
+        }
+        if (!empty($REV) && function_exists('io_readWikiPage') && function_exists('p_get_instructions')) {
+            $instructions = p_get_instructions(io_readWikiPage($file, $ID, $REV));
+        } elseif (function_exists('p_cached_instructions')) {
+            $instructions = p_cached_instructions($file, false, $ID);
+        } else {
+            return null;
+        }
+        if (!is_array($instructions)) {
+            return null;
+        }
+
+        $steps = array();
+        $this->_collectOdtCaptionSteps($instructions, $steps);
+
+        $nums = array(
+            'figure' => $this->_fignum,
+            'table' => $this->_tabnum,
+            'codeblock' => $this->_codenum,
+            'fileblock' => $this->_filenum,
+        );
+        if ($this->_type !== '' && isset($nums[$this->_type])) {
+            $nums[$this->_type]++;
+        }
+
+        $skip = ($this->_odt_page_id === $ID) ? $this->_odt_step_count : 0;
+        $total = count($steps);
+        for ($i = $skip; $i < $total; $i++) {
+            $step = $steps[$i];
+            if ($step['state'] === DOKU_LEXER_SPECIAL) {
+                $nums[$step['type']] = $step['num'];
+            } elseif ($step['state'] === DOKU_LEXER_ENTER) {
+                if ($step['label'] === $label) {
+                    return $nums[$step['type']];
+                }
+                $nums[$step['type']]++;
+            }
+        }
+
+        return null;
+    }
     
     /**
      * return some info
@@ -141,7 +263,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 // If we have a label, assign it to the global label array
                                 if ($label) {
                                     global $caption_labels;
-                                    $caption_labels[$label] = $this->_tabnum;
+                                    $caption_labels[$label] = $this->_codenum;
                                     $this->_codelabels[$this->_codenum] = $label;
                                     $renderer->doc .= ' id="'.$renderer->_xmlEntities($label).'"';
                                     // WARNING: Potential harmful way of handling references
@@ -161,7 +283,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 if ($label) {
                                     global $caption_labels;
                                     $caption_labels[$label] = $this->_filenum;
-                                    $this->_tablabels[$this->_filenum] = $label;
+                                    $this->_filelabels[$this->_filenum] = $label;
                                     $renderer->doc .= ' id="'.$renderer->_xmlEntities($label).'"';
                                     // WARNING: Potential harmful way of handling references
                                     //          that have already been printed
@@ -230,7 +352,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 $renderer->doc .= '<div class="plugin_caption_caption"><span class="plugin_caption_caption_number"';
                                 if(array_key_exists($this->_filenum,$this->_filelabels)) {
                                     $renderer->doc .= ' title="'
-                                                        .$this->_tablabels[$this->_filenum].'"';
+                                                        .$this->_filelabels[$this->_filenum].'"';
                                 }
                                 $renderer->doc .= '>';
                                 if ($this->getConf('abbrev')) {
@@ -382,35 +504,54 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
          *          with the tables - therefore, within the table tags only a table
          *            is allowed, without any additional markup.
          */
-        if ($mode == 'odt') {
+        if ($mode == 'odt' || $mode == 'odt_pdf') {
 
             list($state,$match) = $data;
 
             switch ($state) {
                 case DOKU_LEXER_ENTER :
-                    // Handle case that there is a label in the opening tag
-                    list($match,$label) = explode(' ',$match);
-                    if (in_array($match,$this->_types)) {
-                        $this->_type = $match;
+                    $parts = explode(' ', $match);
+                    $type = $parts[0];
+                    $label = count($parts) > 1 ? $parts[1] : null;
+                    if (in_array($type, $this->_types)) {
+                        $this->_recordOdtStep();
+                        $this->_type = $type;
+                        $this->_label = '';
                         switch ($this->_type) {
                             case "figure" :
-                                // If we have a label, assign it to the global label array
                                 if ($label) {
                                     global $caption_labels;
                                     $caption_labels[$label] = $this->_fignum;
                                     $this->_label = $label;
                                 }
+                                $renderer->p_open();
+                                if ($this->_label && method_exists($renderer, 'insertBookmark')) {
+                                    $renderer->insertBookmark(self::odtBookmarkId($this->_label, $renderer), true);
+                                    $this->_label = '';
+                                }
                                 break;
                             case "table" :
-                                // If we have a label, assign it to the global label array
                                 if ($label) {
                                     global $caption_labels;
                                     $caption_labels[$label] = $this->_tabnum;
                                     $this->_label = $label;
                                 }
                                 break;
+                            case "codeblock" :
+                                if ($label) {
+                                    global $caption_labels;
+                                    $caption_labels[$label] = $this->_codenum;
+                                    $this->_label = $label;
+                                }
+                                break;
+                            case "fileblock" :
+                                if ($label) {
+                                    global $caption_labels;
+                                    $caption_labels[$label] = $this->_filenum;
+                                    $this->_label = $label;
+                                }
+                                break;
                         }
-                        $renderer->p_open();
                     }
                     break;
 
@@ -419,6 +560,11 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                     if (!$this->_incaption) {
                         $this->_incaption = true;
                         $renderer->p_close();
+                        $renderer->p_open();
+                        if ($this->_label && method_exists($renderer, 'insertBookmark')) {
+                            $renderer->insertBookmark(self::odtBookmarkId($this->_label, $renderer), true);
+                            $this->_label = '';
+                        }
                         switch ($this->_type) {
                             case "figure" :
                                 if ($this->getConf('abbrev')) {
@@ -436,17 +582,26 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 }
                                 $renderer->cdata(" " . $this->_tabnum . ": ");
                                 break;
+                            case "codeblock" :
+                                if ($this->getConf('abbrev')) {
+                                    $renderer->cdata($this->getLang('codeabbrev'));
+                                } else {
+                                    $renderer->cdata($this->getLang('codelong'));
+                                }
+                                $renderer->cdata(" " . $this->_codenum . ": ");
+                                break;
+                            case "fileblock" :
+                                if ($this->getConf('abbrev')) {
+                                    $renderer->cdata($this->getLang('fileabbrev'));
+                                } else {
+                                    $renderer->cdata($this->getLang('filelong'));
+                                }
+                                $renderer->cdata(" " . $this->_filenum . ": ");
+                                break;
                         }
                     } else {
                         $this->_incaption = false;
-                        switch ($this->_type) {
-                            case "figure" :
-                                $renderer->p_open();
-                                break;
-                            case "table" :
-//                                $renderer->p_open();
-                                break;
-                        }
+                        $renderer->p_close();
                     }
                     break;
 
@@ -456,17 +611,52 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                     break;
 
                 case DOKU_LEXER_EXIT :
-                    // increment figure/table number
+                    if ($this->_label && method_exists($renderer, 'insertBookmark')) {
+                        $renderer->insertBookmark(self::odtBookmarkId($this->_label, $renderer), true);
+                        $this->_label = '';
+                    }
+                    // increment figure/table/codeblock/fileblock number
                     switch ($this->_type) {
                         case "figure" :
                             $this->_fignum++;
-                            $renderer->p_close();
                             break;
                         case "table" :
                             $this->_tabnum++;
                             break;
+                        case "codeblock" :
+                            $this->_codenum++;
+                            break;
+                        case "fileblock" :
+                            $this->_filenum++;
+                            break;
                     }
+                    $renderer->p_close();
                     $this->_type = '';
+                    break;
+
+                case DOKU_LEXER_SPECIAL :
+                    if (strpos($match, '=') !== false) {
+                        list($_type, $_num) = explode('=', trim($match), 2);
+                        $_type = trim($_type);
+                        $_num = (int) trim($_num);
+                        if (in_array($_type, $this->_types)) {
+                            $this->_recordOdtStep();
+                            switch ($_type) {
+                                case "figure" :
+                                    $this->_fignum = $_num;
+                                    break;
+                                case "table" :
+                                    $this->_tabnum = $_num;
+                                    break;
+                                case "codeblock" :
+                                    $this->_codenum = $_num;
+                                    break;
+                                case "fileblock" :
+                                    $this->_filenum = $_num;
+                                    break;
+                            }
+                        }
+                    }
                     break;
             }
             return true;
