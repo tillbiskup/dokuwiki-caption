@@ -141,7 +141,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 // If we have a label, assign it to the global label array
                                 if ($label) {
                                     global $caption_labels;
-                                    $caption_labels[$label] = $this->_tabnum;
+                                    $caption_labels[$label] = $this->_codenum;
                                     $this->_codelabels[$this->_codenum] = $label;
                                     $renderer->doc .= ' id="'.$renderer->_xmlEntities($label).'"';
                                     // WARNING: Potential harmful way of handling references
@@ -161,7 +161,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 if ($label) {
                                     global $caption_labels;
                                     $caption_labels[$label] = $this->_filenum;
-                                    $this->_tablabels[$this->_filenum] = $label;
+                                    $this->_filelabels[$this->_filenum] = $label;
                                     $renderer->doc .= ' id="'.$renderer->_xmlEntities($label).'"';
                                     // WARNING: Potential harmful way of handling references
                                     //          that have already been printed
@@ -230,7 +230,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 $renderer->doc .= '<div class="plugin_caption_caption"><span class="plugin_caption_caption_number"';
                                 if(array_key_exists($this->_filenum,$this->_filelabels)) {
                                     $renderer->doc .= ' title="'
-                                                        .$this->_tablabels[$this->_filenum].'"';
+                                                        .$this->_filelabels[$this->_filenum].'"';
                                 }
                                 $renderer->doc .= '>';
                                 if ($this->getConf('abbrev')) {
