@@ -79,20 +79,42 @@ class syntax_plugin_caption_reference extends DokuWiki_Syntax_Plugin {
             return true;
         }
         
-        if ($mode == 'odt') {
+        if ($mode == 'odt' || $mode == 'odt_pdf') {
 
             list($state,$match) = $data;
-            
+
             switch ($state) {
                 case DOKU_LEXER_SPECIAL :
-                    $renderer->doc .= '<text:sequence-ref text:reference-format="value" text:ref-name="'.$match.'">';
                     global $caption_labels;
-                    if (isset($caption_labels[$match]) && $caption_labels[$match]) {
-                        $renderer->doc .= $caption_labels[$match];
-                    } else {
-                        $renderer->doc .= '##REF:'.$match.'##';
+                    $ref = null;
+                    if (isset($caption_labels[$match]) && $caption_labels[$match] !== '') {
+                        $ref = $caption_labels[$match];
+                    } elseif (function_exists('plugin_load')) {
+                        $captionPlugin = plugin_load('syntax', 'caption_caption');
+                        if ($captionPlugin && method_exists($captionPlugin, 'resolveForwardRef')) {
+                            $ref = $captionPlugin->resolveForwardRef($match);
+                        }
                     }
-                    $renderer->doc .= '</text:sequence-ref>';
+
+                    if ($ref !== null) {
+                        $refStr = (string) $ref;
+                        if (method_exists($renderer, 'insertBookmark') && method_exists($renderer, 'externallink')) {
+                            if (class_exists('syntax_plugin_caption_caption') && method_exists('syntax_plugin_caption_caption', 'odtBookmarkId')) {
+                                $bookmarkId = syntax_plugin_caption_caption::odtBookmarkId($match, $renderer);
+                            } else {
+                                $escaped = method_exists($renderer, '_xmlEntities')
+                                    ? $renderer->_xmlEntities(trim($match))
+                                    : htmlspecialchars(trim($match), ENT_QUOTES, 'UTF-8');
+                                $bookmarkId = 'plugin_caption_' . str_replace(' ', '_', strtolower($escaped));
+                            }
+                            $renderer->p_open();
+                            $renderer->externallink('#' . $bookmarkId, $refStr);
+                        } else {
+                            $renderer->cdata($refStr);
+                        }
+                    } else {
+                        $renderer->cdata('##REF:'.$match.'##');
+                    }
                     break;
             }
             return true;
